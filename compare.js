@@ -10,33 +10,35 @@ var path = []
 
 //---------------------------------- functions ----------------------------------
 
-function AsyncRL (resolve) {
+function AsyncRL (resolve,configName) {
 
 	const rl = readline.createInterface({
 	 input: process.stdin,
 	 output: process.stdout,
 	});
     
-    rl.question("Overwrite this config?\n"
+    rl.question( "----------------------------\n"
+    	+ configName + "\n"
+    	+ "Overwrite this config?\n"
         + "y or n\n"
         , function (line) {
-        	console.log("line: ", line)
+
             switch (line){
 
                 case "n":
-                	console.log("No change")
+                	//console.log("No change")
                 	rl.close();
-                    resolve("No");
+                    resolve(false);
                     break;
                 case "y":
-                	console.log("OK")
+                	//console.log("OK")
                     rl.close();
-                    resolve("Yes");
+                    resolve(true);
                     break;
                 default:
                     console.log("No such option. Please enter another: ");
             		rl.close();
-            		resolve("def");
+            		AsyncRL(resolve,configName);
             		break;
             }
     
@@ -45,21 +47,22 @@ function AsyncRL (resolve) {
 
 const comparePromise = async (sourceD, targetD) =>
   {
-  	if (changes==""){
-    	let result = await new Promise(r => compFiles(r,sourceD, targetD));
-    }
+  	
+    let result = await new Promise(r => compFiles(r,sourceD, targetD));
+    
     return 'comparison done'
   }
 
-const promptPromise = async n =>
+const promptPromise = async ch =>
   {
-    for (let i = 0; i < n; i++) {
+  
+    for ( let i in ch) {
 
-    	console.log(await new Promise(r => AsyncRL(r)));
+    	let result = await new Promise(r => AsyncRL(r,ch[i][0]));
 
     }
     
-    return 'done'
+    return 'prompt done'
   }
 
 function compFiles(resolve,sourceD, targetD) {
@@ -118,8 +121,10 @@ module.exports = {
 
 	compareFiles: function (sourceD, targetD) {
 
-		comparePromise(sourceD, targetD).then(x => console.log(x, changes))
-
-
+		comparePromise(sourceD, targetD).then(x => {
+										console.log(x);
+										promptPromise(changes).then(f => console.log(f))
+										})
+										
 	}
 }
