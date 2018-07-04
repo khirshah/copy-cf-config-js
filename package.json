@@ -1,0 +1,11 @@
+{
+  "name": "copy-cloudfunctions-config",
+  "version": "1.0.0",
+  "description": "copies cloud-functions configs",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Agnes Meri",
+  "license": "ISC"
+}
