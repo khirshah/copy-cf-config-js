@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const readline = require('readline');
 
-
+var changes = []
 
 var path = []
 
@@ -43,28 +43,27 @@ function AsyncRL (resolve) {
     });
 };
 
-/*const comparePromise = async =>
+const comparePromise = async (sourceD, targetD) =>
   {
-
-    await new Promise(r => compFiles());
-
+  	if (changes==""){
+    	let result = await new Promise(r => compFiles(r,sourceD, targetD));
+    }
     return 'comparison done'
   }
-*/
+
 const promptPromise = async n =>
   {
     for (let i = 0; i < n; i++) {
 
-      let result = await new Promise(r => AsyncRL(r));
+    	console.log(await new Promise(r => AsyncRL(r)));
 
     }
     
     return 'done'
   }
 
-function compFiles(sourceD, targetD){
+function compFiles(resolve,sourceD, targetD) {
 
-	var changes = []
 	//to track where we are and indicate the last item
 	var sourceItemCount = Object.keys(sourceD).length;
 	
@@ -78,21 +77,21 @@ function compFiles(sourceD, targetD){
 			pathString += path[item] + '.'
 			}
 		pathString += i;
+
 		//if our item is a dictionary, we have to dig deeper
 		if (typeof sourceD[i] == "object") {
-
 
 			//before going down, let's add the current level to the path
 			path.push(i)
 			//the function calls itself
-			compFiles(sourceD[i], targetD[i]);
+			compFiles(resolve,sourceD[i], targetD[i]);
 		}
 		//else we got a string, that we can write in the file
 		
 		else {
 
 			if (sourceD[i]!=targetD[i]) {
-				console.log("diff: ", pathString,"***",sourceD[i] , " - ", targetD[i])
+				//console.log("diff: ", pathString,"***",sourceD[i] , " - ", targetD[i])
 				changes.push([pathString,sourceD[i],targetD[i]])
 
 			}
@@ -100,8 +99,14 @@ function compFiles(sourceD, targetD){
 		}
 		//after the last item in the current dictionary we jump one level up,
       	//thus we have to delete the last item from our path list
+
 		if (sourceItemCount == 0) {
 			
+			if (path=="") {
+
+				resolve("recursion done");
+			}
+
 			path.pop()
 		}
 	}
@@ -112,7 +117,9 @@ function compFiles(sourceD, targetD){
 module.exports = {
 
 	compareFiles: function (sourceD, targetD) {
-		compFiles(sourceD, targetD)
+
+		comparePromise(sourceD, targetD).then(x => console.log(x, changes))
+
 
 	}
 }
