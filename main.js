@@ -1,11 +1,7 @@
-const fs = require('fs');
-
+//load data
 var sourceData=require('./sourceData.json');
 var targetData=require('./targetData.json');
-
-var ref=require("./reformat.js");
+//load file to run
 var comp=require("./compare.js");
-
-
-//ref.dictToList(sourceData);
+//run file content
 comp.compareFiles(sourceData,targetData);
