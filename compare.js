@@ -3,9 +3,10 @@
 const fs = require('fs');
 //lodash
 var _ = require("lodash")
-
+//readline
 const readline = require('readline');
 
+//-------------------------------- arrays --------------------------------
 var changes = []
 
 var configChanges = []
@@ -14,13 +15,14 @@ var path = []
 
 //---------------------------------- functions ----------------------------------
 
-const delPromise= async () => 
+const delPromise = async () => 
 	{
 	
 	let result = await new Promise (r => fs.truncate('config.txt', 0, () => r("config.txt is empty")))
 	let result2 = await new Promise (r => fs.truncate('configChanges.txt', 0, () => r("configChanges.txt is empty")))
 	
 	return "config files are empty";
+	
 	}
 
 const promptPromise = async ch =>
@@ -31,7 +33,7 @@ const promptPromise = async ch =>
     	let result = await new Promise(r => promptUser(r,ch[i]));
 
     	if (result == true) {
-    		let configString=`firebase functions:config:set ${ch[i][0]}="${ch[i][1]}"`
+    		let configString = `firebase functions:config:set ${ch[i][0]}="${ch[i][1]}"`
     		
     		configChanges.push(configString)
     		
@@ -45,30 +47,31 @@ const promptPromise = async ch =>
 
 function promptUser (resolve,config) {
 
-	var configName=config[0]
-	var displayText=""
+	var configName = config[0]
+	var diffDesc = ""
+	//identify the difference type
 	if (!config[1]) {
-		displayText="Source value is missing."
+		diffDesc = "Source value is missing."
 	}
 	else if (!config[2]) {
-		displayText="Target value is missing."
+		diffDesc = "Target value is missing."
 	}
 	else {
-		displayText="Source and target values are different"
+		diffDesc = "Source and target values are different"
 	}
 
+	//initiate readline interface for user promting
 	const rl = readline.createInterface({
 	 input: process.stdin,
 	 output: process.stdout,
 	});
-
-
-    
+    //ask question
     rl.question( "----------------------------\n"
-    	+ displayText +"\n"
+    	+ diffDesc +"\n"
     	+ configName + "\n"
     	+ "Overwrite this config?\n"
         + "y or n\n"
+        //handle response
         , function (line) {
 
             switch (line){
@@ -157,11 +160,8 @@ function compFiles(resolve,soD, taD, array, mode) {
 			}
 
 		}
-
-		
 		//after the last item in the current dictionary we jump one level up,
       	//thus we have to delete the last item from our path list
-
 		if (sourceItemCount == 0) {
 			
 			if (path=="") {
@@ -171,11 +171,10 @@ function compFiles(resolve,soD, taD, array, mode) {
 
 			path.pop()
 		}
-	}
-	
-}
+	}	
+};
 
-
+//---------------------------------- main function ----------------------------
 module.exports = {
 
 	compareFiles: function (sourceD, targetD) {
