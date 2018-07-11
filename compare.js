@@ -42,7 +42,8 @@ const promptPromise = async ch =>
 
     }
     
-    return `That's all, the config changes are in configChanges.txt`
+    return `That's all, the config changes are in configChanges.txt\n
+    		backup config for target enviroment is in config.txt`
   }
 
 function promptUser (resolve,config) {
@@ -133,9 +134,7 @@ function compFiles(resolve,soD, taD, array, mode) {
 		else {
 			//if comparing source to target
 			if (mode=="base") {
-				//create line of backup config file
-				let cfString=`firebase functions:config:set ${pathString}="${soD[i]}"`
-				fs.appendFileSync("config.txt",cfString + "\n");
+
 				//if source and target values differ
 				if (soD[i]!=taD[i] && soD[i] && taD[i]) {
 
@@ -151,6 +150,9 @@ function compFiles(resolve,soD, taD, array, mode) {
 			}
 			
 			else if (mode="reverse") {
+				//create line of backup config file
+				let cfString=`firebase functions:config:set ${pathString}="${taD[i]}"`
+				fs.appendFileSync("config.txt",cfString + "\n");
 
 				if (!taD[i]) {
 
